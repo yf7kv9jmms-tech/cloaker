@@ -1,1 +1,136 @@
-.
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Home - Google Drive</title>
+	<link rel="icon" href="favicon.ico">
+	<style>
+		:root {
+			color-scheme: light;
+			font-family: Arial, sans-serif;
+			background: #f8fafd;
+			color: #202124;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			min-height: 100vh;
+			margin: 0;
+			display: grid;
+			place-items: center;
+		}
+
+		main {
+			width: min(100% - 32px, 420px);
+			padding: 32px;
+			background: #fff;
+			border: 1px solid #dadce0;
+			border-radius: 8px;
+		}
+
+		h1 {
+			margin: 0 0 24px;
+			font-size: 20px;
+			font-weight: 500;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 8px;
+			font-size: 14px;
+		}
+
+		input {
+			width: 100%;
+			height: 44px;
+			padding: 0 12px;
+			border: 1px solid #80868b;
+			border-radius: 4px;
+			font: inherit;
+		}
+
+		input:focus {
+			outline: 2px solid #1a73e8;
+			outline-offset: 1px;
+		}
+
+		button {
+			min-height: 40px;
+			margin-top: 16px;
+			padding: 0 20px;
+			border: 0;
+			border-radius: 4px;
+			background: #1a73e8;
+			color: #fff;
+			font: inherit;
+			font-weight: 500;
+			cursor: pointer;
+		}
+
+		button:hover { background: #1765cc; }
+
+		#message {
+			min-height: 20px;
+			margin: 12px 0 0;
+			color: #b3261e;
+			font-size: 13px;
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<h1>Open a page</h1>
+		<form id="launch-form">
+			<label for="destination">Website URL</label>
+			<input id="destination" name="destination" type="url" placeholder="https://googledrivee.wasmer.app/" value="https://googledrivee.wasmer.app/" required>
+			<button type="submit">Open</button>
+			<p id="message" role="status" aria-live="polite"></p>
+		</form>
+	</main>
+	<script>
+		const form = document.querySelector("#launch-form");
+		const destination = document.querySelector("#destination");
+		const message = document.querySelector("#message");
+
+		form.addEventListener("submit", (event) => {
+			event.preventDefault();
+			message.textContent = "";
+
+			let target;
+			try {
+				target = new URL(destination.value);
+			} catch {
+				message.textContent = "Enter a valid website URL.";
+				return;
+			}
+
+			if (target.protocol !== "https:" && target.protocol !== "http:") {
+				message.textContent = "Use an HTTP or HTTPS website URL.";
+				return;
+			}
+
+			const blank = window.open("about:blank", "_blank");
+			if (!blank) {
+				message.textContent = "Allow pop-ups to open the page.";
+				return;
+			}
+
+			blank.document.title = "Home - Google Drive";
+
+			const icon = blank.document.createElement("link");
+			icon.rel = "icon";
+			icon.href = new URL("favicon.ico", window.location.href).href;
+			blank.document.head.append(icon);
+
+			const frame = blank.document.createElement("iframe");
+			frame.src = target.href;
+			frame.title = "Website";
+			frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:0";
+			blank.document.body.style.cssText = "margin:0;overflow:hidden";
+			blank.document.body.append(frame);
+		});
+	</script>
+</body>
+</html>
